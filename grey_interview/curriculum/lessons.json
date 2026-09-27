@@ -1,0 +1,1005 @@
+[
+  {
+    "id": "python-basics",
+    "track": "coding",
+    "title": "Python: values, decisions & loops",
+    "stage": "Refreshers (optional)",
+    "minutes": 25,
+    "objectives": [
+      "Use numbers, strings and booleans.",
+      "Follow indentation and branch conditions.",
+      "Trace a loop and return its result."
+    ],
+    "exercises": [
+      {
+        "title": "Calculate a request budget",
+        "prompt": "Implement remaining_budget(limit, used). Both values are nonnegative integers. Return the unused budget, but never a negative value. Explain your types and conditional. Show tests for below, equal to, and above the limit.",
+        "acceptance_checks": [
+          "remaining_budget(10, 3) returns 7.",
+          "remaining_budget(10, 10) and remaining_budget(10, 15) return 0.",
+          "No printing instead of returning."
+        ],
+        "interviewer_notes": "max(0, limit-used) or an if branch is valid. Inputs guaranteed nonnegative integers. Explain arithmetic and return.",
+        "starter_code": "def remaining_budget(limit: int, used: int) -> int:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Count successful requests",
+        "prompt": "Implement count_success(statuses) for a list of integer HTTP status codes. Count codes from 200 to 299 inclusive. Use a loop and explain how its counter changes. Include empty-list and boundary tests.",
+        "acceptance_checks": [
+          "[200, 404, 201, 500, 299] returns 3.",
+          "199 and 300 are excluded; 200 and 299 included.",
+          "Empty input returns 0."
+        ],
+        "interviewer_notes": "Initialize a counter at zero, increment for 200 <= status < 300, return after loop. Avoid return inside loop.",
+        "starter_code": "def count_success(statuses: list[int]) -> int:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "checks": [
+      {
+        "question": "What is the value of 7 // 2 in Python?",
+        "options": [
+          "3.5",
+          "3",
+          "4",
+          "\"3\""
+        ],
+        "answer": 1,
+        "explanation": "// performs floor division; for these positive integers the result is the integer 3."
+      },
+      {
+        "question": "What does range(3) produce when iterated?",
+        "options": [
+          "1, 2, 3",
+          "0, 1, 2, 3",
+          "0, 1, 2",
+          "3 only"
+        ],
+        "answer": 2,
+        "explanation": "The stop value is excluded, and the default start is 0."
+      },
+      {
+        "question": "How does a function send a value back to its caller?",
+        "options": [
+          "print(value)",
+          "return value",
+          "input(value)",
+          "A comment"
+        ],
+        "answer": 1,
+        "explanation": "return gives the caller a value. print writes output and itself returns None."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "python-collections",
+    "track": "coding",
+    "title": "Python: lists, dictionaries & sets",
+    "stage": "Refreshers (optional)",
+    "minutes": 25,
+    "objectives": [
+      "Choose a collection for a problem.",
+      "Understand references and mutation.",
+      "Use membership tests and safe dictionary access."
+    ],
+    "exercises": [
+      {
+        "title": "Count job types",
+        "prompt": "Implement count_types(job_types) returning a dictionary of string counts. Preserve the input. Explain why a dictionary fits and what happens on the first appearance of a type.",
+        "acceptance_checks": [
+          "[\"email\", \"sync\", \"email\"] returns {\"email\": 2, \"sync\": 1}.",
+          "[] returns {}.",
+          "Handle a previously unseen key without KeyError."
+        ],
+        "interviewer_notes": "Use counts.get(kind,0)+1 or membership initialization. Expected O(n) time, O(k) output storage.",
+        "starter_code": "def count_types(job_types: list[str]) -> dict[str, int]:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Make an independent queue copy",
+        "prompt": "Implement enqueue_copy(queue, job) that returns a new list with job appended and leaves queue unchanged. Explain why new_queue = queue would not make an independent copy. Nested objects do not need to be copied.",
+        "acceptance_checks": [
+          "Original [\"a\"] stays [\"a\"]; result is [\"a\", \"b\"].",
+          "Empty input works.",
+          "Explain shallow copying and aliasing."
+        ],
+        "interviewer_notes": "queue.copy() then append, list(queue), or queue+[job] are valid. append returns None. A shallow copy suffices.",
+        "starter_code": "def enqueue_copy(queue: list[str], job: str) -> list[str]:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "checks": [
+      {
+        "question": "Which collection is a natural choice for checking unique IDs?",
+        "options": [
+          "A set",
+          "A float",
+          "A boolean",
+          "A single string"
+        ],
+        "answer": 0,
+        "explanation": "A set stores distinct hashable values and supports membership testing."
+      },
+      {
+        "question": "After a = [1]; b = a; b.append(2), what is a?",
+        "options": [
+          "[1]",
+          "[2]",
+          "None",
+          "[1, 2]"
+        ],
+        "answer": 3,
+        "explanation": "Both names refer to the same mutable list."
+      },
+      {
+        "question": "What does {}.get(\"missing\", 0) return?",
+        "options": [
+          "KeyError",
+          "None",
+          "0",
+          "\"missing\""
+        ],
+        "answer": 2,
+        "explanation": "dict.get returns the supplied default when the key is absent."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "python-functions",
+    "track": "coding",
+    "title": "Python: functions, errors & tests",
+    "stage": "Refreshers (optional)",
+    "minutes": 25,
+    "objectives": [
+      "Separate input, behavior and output.",
+      "Use explicit error handling.",
+      "Test behavior without claiming unrun results."
+    ],
+    "exercises": [
+      {
+        "title": "Parse a positive retry count",
+        "prompt": "Implement parse_retries(text): convert a string to an integer, and raise ValueError if it is not a valid integer or is less than 1. Do not hide the failure by returning 0. Explain your contract.",
+        "acceptance_checks": [
+          "\"3\" returns 3; \" 2 \" returns 2.",
+          "\"zero\", \"0\" and \"-1\" raise ValueError.",
+          "Test both valid and invalid input."
+        ],
+        "interviewer_notes": "int(text) naturally raises ValueError for invalid strings; validate positive after conversion. No broad except is needed.",
+        "starter_code": "def parse_retries(text: str) -> int:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Fix shared request history",
+        "prompt": "The function below unexpectedly shares history between calls. Explain why, fix it, and write a regression test showing that two calls without a supplied history do not share state. Preserve appending to an explicitly supplied list.",
+        "acceptance_checks": [
+          "Default calls produce independent lists.",
+          "An explicit list is updated and returned.",
+          "Explain when the default argument is evaluated."
+        ],
+        "interviewer_notes": "Use history=None then if history is None: history=[]. Do not use history or [] because an explicitly passed empty list must be retained.",
+        "starter_code": "def record_request(request_id, history=[]):\n    history.append(request_id)\n    return history",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "checks": [
+      {
+        "question": "When is a function default like history=[] evaluated?",
+        "options": [
+          "On every call",
+          "When the function definition executes",
+          "Only after an exception",
+          "Never"
+        ],
+        "answer": 1,
+        "explanation": "That list can be reused across calls. Use a None default when each call needs a new list."
+      },
+      {
+        "question": "Which exception normally comes from int(\"hello\")?",
+        "options": [
+          "ValueError",
+          "KeyError",
+          "FileNotFoundError",
+          "No exception"
+        ],
+        "answer": 0,
+        "explanation": "The string is not a valid integer representation."
+      },
+      {
+        "question": "What is a regression test for a bug?",
+        "options": [
+          "A benchmark of any function",
+          "A comment saying fixed",
+          "A test reproducing the failure and checking the corrected behavior",
+          "A list of dependencies"
+        ],
+        "answer": 2,
+        "explanation": "It preserves the failure case so later changes can be checked against it."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "design-basics",
+    "track": "system-design",
+    "title": "Systems: requests, APIs & storage",
+    "stage": "Refreshers (optional)",
+    "minutes": 25,
+    "objectives": [
+      "Trace a client request through a service.",
+      "Distinguish persistent data from a cache.",
+      "State requirements before selecting components."
+    ],
+    "exercises": [
+      {
+        "title": "Design a saved-notes API",
+        "prompt": "Design a small service that lets a user create a note and read it by ID. State the request/response shape, sketch client -> API -> database in Mermaid or text, and explain what survives a service restart. Assume one region and modest traffic.",
+        "acceptance_checks": [
+          "Define create and read endpoints and a missing-note response.",
+          "Show the persistent store and request path.",
+          "State one access-control requirement and one failure case."
+        ],
+        "interviewer_notes": "POST /notes and GET /notes/{id} with a durable database are sufficient. Need ownership checks or equivalent. Cache optional, not the source of truth.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Translate requirements into decisions",
+        "prompt": "Your notes service handles 20 reads/second and 2 writes/second. Users must see their new note after saving it. Explain whether a cache is necessary now, the tradeoff if one is introduced, and two measurements you would collect before scaling.",
+        "acceptance_checks": [
+          "Do not equate traffic rate with latency or storage size.",
+          "Discuss freshness and cache invalidation if adding a cache.",
+          "Name metrics and how they guide a decision."
+        ],
+        "interviewer_notes": "A simple indexed database may suffice; no obligation to cache. Need measurable latency/error/load observations. A stale cache could violate read-after-write behavior.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "checks": [
+      {
+        "question": "What primarily makes a database different from an in-process dictionary here?",
+        "options": [
+          "It always has lower latency",
+          "It can provide durable shared storage across process restarts",
+          "It needs no failure handling",
+          "It removes the need for IDs"
+        ],
+        "answer": 1,
+        "explanation": "A correctly configured persistent database can survive service restarts. An in-memory dictionary alone cannot."
+      },
+      {
+        "question": "What should happen when a requested note does not exist?",
+        "options": [
+          "Return another user's note",
+          "Pretend it succeeded",
+          "Return a defined not-found response",
+          "Crash the process"
+        ],
+        "answer": 2,
+        "explanation": "The API should make missing resources explicit, commonly with HTTP 404."
+      },
+      {
+        "question": "What should you clarify before adding a cache?",
+        "options": [
+          "Only the logo color",
+          "Freshness requirements and the measured bottleneck",
+          "Whether caches are popular",
+          "Nothing"
+        ],
+        "answer": 1,
+        "explanation": "A cache adds invalidation and consistency choices. Identify the need and acceptable staleness first."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "design-reliability",
+    "track": "system-design",
+    "title": "Systems: queues, retries & capacity",
+    "stage": "Refreshers (optional)",
+    "minutes": 25,
+    "objectives": [
+      "Separate synchronous work from queued work.",
+      "Understand duplicate delivery and idempotency.",
+      "Calculate throughput and backlog with units."
+    ],
+    "exercises": [
+      {
+        "title": "Make notification retries safe",
+        "prompt": "Design queued email notifications. A worker can crash after sending an email but before acknowledging the job. Describe the duplicate risk, an idempotency strategy and its assumptions, a retry limit, and the final failure state.",
+        "acceptance_checks": [
+          "Explain why retry may send twice.",
+          "Do not claim exactly-once from a queue alone.",
+          "Use a stable job key and discuss the downstream sender's guarantees."
+        ],
+        "interviewer_notes": "Downstream idempotency support or deduplication with acknowledged limitations is needed to address the send/ack gap. Retries should be bounded and observable.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Calculate a queue backlog",
+        "prompt": "A queue receives 12 jobs/second while workers complete 8 jobs/second for 2 minutes. Initially empty, with no rejections or other limits, how many jobs accumulate? Propose one admission-control policy and one capacity change, with a tradeoff for each.",
+        "acceptance_checks": [
+          "Show rate difference and convert minutes to seconds.",
+          "Specify behavior visible to clients when capacity is exceeded.",
+          "State what metric verifies recovery."
+        ],
+        "interviewer_notes": "Backlog growth=(12-8)*120=480 jobs. More workers or faster processing help if dependencies permit; rejecting or bounding work protects latency but reduces acceptance.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "checks": [
+      {
+        "question": "What does an idempotency key aim to prevent?",
+        "options": [
+          "All network delays",
+          "All authentication",
+          "Duplicate visible effects for the same logical operation",
+          "Every database failure"
+        ],
+        "answer": 2,
+        "explanation": "A stable key lets a system recognize repeats of the same operation, within its retention and atomicity guarantees."
+      },
+      {
+        "question": "At 5 arrivals/second and 2 seconds of service time, approximate in-flight work is:",
+        "options": [
+          "2.5 jobs",
+          "10 jobs",
+          "7 jobs",
+          "50 jobs"
+        ],
+        "answer": 1,
+        "explanation": "In steady state, arrival rate times average time gives about 10 in-flight jobs. Sizing also needs headroom."
+      },
+      {
+        "question": "What is a risk of unlimited retries during an outage?",
+        "options": [
+          "They always improve throughput",
+          "They remove all duplicates",
+          "They guarantee recovery",
+          "They can amplify load and prolong the outage"
+        ],
+        "answer": 3,
+        "explanation": "Bound attempts, use backoff, and make failed work observable instead of retrying endlessly."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "coding",
+    "title": "Solve a small problem out loud",
+    "objectives": [
+      "State an input/output contract before coding.",
+      "Explain an invariant and complexity.",
+      "Use concrete normal, boundary and failure cases."
+    ],
+    "exercises": [
+      {
+        "title": "Keep the first occurrence",
+        "prompt": "Implement unique_ids(ids): return IDs in their first-seen order. IDs are strings; the empty string is valid. Do not change the input. Explain your invariant, time and space costs, and supply tests. Input fits in memory. Python is used in the guide; another language is fine if you state the equivalent contract.",
+        "acceptance_checks": [
+          "[\"a\", \"b\", \"a\", \"\", \"b\"] becomes [\"a\", \"b\", \"\"].",
+          "Empty input returns []; input remains unchanged.",
+          "Explain membership tracking and test all-equal and all-distinct inputs."
+        ],
+        "interviewer_notes": "A seen set plus an output list gives expected O(n) time and O(k) extra space for k unique IDs. Sorting breaks original order. Accept a slower correct baseline if complexity is accurately stated.",
+        "starter_code": "def unique_ids(ids: list[str]) -> list[str]:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Split inference jobs into batches",
+        "prompt": "Implement batches(jobs, size), returning a list of nonempty batches in original order. size is an integer; raise ValueError when size <= 0, including when jobs is empty. The final batch may be smaller. Explain and test the boundary cases.",
+        "acceptance_checks": [
+          "Five jobs with size 2 produce batch lengths [2, 2, 1].",
+          "Empty jobs with a positive size return [].",
+          "Zero and negative sizes fail; the original list is not mutated.",
+          "Flattening the result recovers the original job sequence."
+        ],
+        "interviewer_notes": "Validate size before iteration. Slicing in steps of size is a straightforward O(n) element-copying approach and O(n) output space. Test exact multiples and size greater than job count.",
+        "starter_code": "def batches(jobs: list[str], size: int) -> list[list[str]]:\n    pass",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "track": "coding",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "For unique IDs in first-seen order, which approach preserves the contract?",
+        "options": [
+          "Sort a set",
+          "Track a seen set and append first occurrences to a list",
+          "Reverse the input",
+          "Count characters"
+        ],
+        "answer": 1,
+        "explanation": "Membership tracking removes duplicates while the separate list preserves first-seen order."
+      },
+      {
+        "question": "For n inputs and k unique values, a seen-set approach typically uses:",
+        "options": [
+          "Expected O(n) time and O(k) storage",
+          "O(1) total time",
+          "No storage",
+          "Always O(n squared) time"
+        ],
+        "answer": 0,
+        "explanation": "Each item is visited once with expected constant-time set lookup; the set and result grow with k."
+      },
+      {
+        "question": "When must batches([], 0) validate size?",
+        "options": [
+          "Never",
+          "Only in the loop",
+          "Before looping",
+          "After returning"
+        ],
+        "answer": 2,
+        "explanation": "An empty loop still needs to reject the invalid parameter."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "system-design",
+    "title": "Draw and defend a small system",
+    "objectives": [
+      "Clarify scope and observable requirements.",
+      "Sketch a request and data flow.",
+      "Estimate capacity and describe one failure path."
+    ],
+    "exercises": [
+      {
+        "title": "An asynchronous document summary service",
+        "prompt": "Design a service where a client submits a document and later retrieves its summary. Assume 10 new jobs/second, average processing time 4 seconds, and a worker can run 5 jobs concurrently. A job may be delivered more than once. Write requirements, API sketches, a Mermaid diagram (or text arrows), an idealized worker-capacity estimate, and a failure/retry explanation.",
+        "acceptance_checks": [
+          "Separate submission from processing and result retrieval.",
+          "Show durable job state and describe how duplicate delivery is handled.",
+          "Calculate in-flight work and minimum worker count, then discuss headroom.",
+          "Describe a worker crash and how a client discovers failure or completion."
+        ],
+        "interviewer_notes": "Steady-state estimate: 10*4=40 in flight, 40/5=8 fully utilized workers minimum; more for headroom. Acknowledge processing distribution and overhead. Durable state/queue plus idempotent completion are reasonable. Visual polish is not assessed.",
+        "starter_code": "",
+        "minutes": 25,
+        "constraints": []
+      },
+      {
+        "title": "Find the overload boundary",
+        "prompt": "Extend your previous design: arrivals rise to 30 jobs/second for 5 minutes, but total worker throughput stays at 10 jobs/second. Estimate the additional backlog. Choose queue limits, client-visible overload behavior, and two useful metrics. Explain what happens when the queue or result database is unavailable.",
+        "acceptance_checks": [
+          "Compute backlog growth assuming no rejections or other bottlenecks.",
+          "Describe a bounded admission or backpressure policy and a tradeoff.",
+          "Specify observable failure behavior instead of silently dropping jobs.",
+          "Define metrics with units and explain what action each informs."
+        ],
+        "interviewer_notes": "Additional backlog is (30-10)*300=6000 jobs. Queue depth, oldest job age, throughput and error rate are useful. Acceptance must follow durable commit; avoid claims of exactly-once execution without a mechanism.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      }
+    ],
+    "track": "system-design",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "When is a queued job durably accepted?",
+        "options": [
+          "When a local variable is set",
+          "After the required durable write succeeds",
+          "Before any storage write",
+          "Whenever the UI animates"
+        ],
+        "answer": 1,
+        "explanation": "The acceptance contract must reflect durable state, including a reliable publication mechanism."
+      },
+      {
+        "question": "At 10 jobs/second and 4 seconds per job, estimated in-flight work is:",
+        "options": [
+          "2.5 jobs",
+          "14 jobs",
+          "40 jobs",
+          "400 jobs"
+        ],
+        "answer": 2,
+        "explanation": "Rate times average duration gives 40 jobs before considering headroom."
+      },
+      {
+        "question": "Which metric best exposes work stuck waiting?",
+        "options": [
+          "Logo size",
+          "Source file count",
+          "Number of API fields",
+          "Oldest queued job age"
+        ],
+        "answer": 3,
+        "explanation": "Age indicates waiting even if queue depth alone looks acceptable."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "ai-systems",
+    "title": "Evaluate a grounded assistant",
+    "objectives": [
+      "Separate retrieval from answer generation.",
+      "Define evidence-based checks.",
+      "Handle unsupported answers and untrusted retrieved text."
+    ],
+    "exercises": [
+      {
+        "title": "Create a tiny evaluation set",
+        "prompt": "A document assistant can read only two fictional policy facts: \"Employees may expense lunch up to $20 per workday\" and \"Receipts are required for claims above $10.\" Propose the retrieval/generation flow and four evaluation cases: a directly supported question, a question requiring both facts, an unanswerable question, and a document containing an instruction to ignore the policy. For each, state expected behavior and a concrete check.",
+        "acceptance_checks": [
+          "Keep generated claims within the supplied evidence.",
+          "Include an explicit abstention/clarification case.",
+          "Treat retrieved instructions as data, not authority.",
+          "Separate retrieval failure from generation failure."
+        ],
+        "interviewer_notes": "These are fictional exercise facts. A $15 claim is within cap but requires a receipt. Unanswerable questions must not invent policy. Accept various evaluation rubrics if consistently applicable.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      },
+      {
+        "title": "Diagnose a retrieval regression",
+        "prompt": "On a frozen 100-question set, retrieval contains needed evidence for 80 questions; the assistant answers 60 of those correctly and the other 20 incorrectly. None of the 20 evidence-missing cases is correct. Compute evidence coverage and correctness conditional on evidence. Propose one experiment for each failure group, plus a latency and cost measurement. Explain how to avoid tuning on the final test set.",
+        "acceptance_checks": [
+          "Report 80/100 evidence coverage and 60/80 conditional correctness with denominators.",
+          "Propose separate retrieval and generation interventions.",
+          "Use fixed inputs and compare against a baseline.",
+          "Keep a held-out final evaluation and report tradeoffs."
+        ],
+        "interviewer_notes": "Coverage is 80%; conditional correctness 75%; overall correctness 60%. Retrieval and evidence-use changes target different failures. These metrics alone do not establish deployment safety.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      }
+    ],
+    "track": "ai-systems",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "The needed passage was not retrieved. Which component needs investigation first?",
+        "options": [
+          "Retrieval",
+          "Only typography",
+          "Only answer formatting",
+          "The browser zoom"
+        ],
+        "answer": 0,
+        "explanation": "Evidence coverage separates retrieval problems from errors using available evidence."
+      },
+      {
+        "question": "A source lacks the requested fact. The grounded assistant should:",
+        "options": [
+          "Invent a likely answer",
+          "Abstain or ask for clarification",
+          "Treat any fluent answer as correct",
+          "Use an unrelated citation"
+        ],
+        "answer": 1,
+        "explanation": "Unsupported details should not be presented as facts from the source."
+      },
+      {
+        "question": "Why keep a held-out final evaluation?",
+        "options": [
+          "To tune on it repeatedly",
+          "To hide failures",
+          "To check changes on examples not used for tuning",
+          "To avoid comparing a baseline"
+        ],
+        "answer": 2,
+        "explanation": "Repeatedly tuning against a test set biases the comparison."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "project",
+    "title": "Explain real ownership",
+    "objectives": [
+      "Connect constraints to decisions.",
+      "Distinguish personal work from team work.",
+      "Use honest evidence and acknowledge uncertainty."
+    ],
+    "exercises": [
+      {
+        "title": "Build an evidence card",
+        "prompt": "Choose one real project, including a small personal one. Write its problem, users, two constraints, your own contribution, a design decision, and evidence of the outcome. If you have no suitable project yet, write an explicitly labeled proposal and a measurement plan; do not invent completed work.",
+        "acceptance_checks": [
+          "Separate your actions from the team outcome.",
+          "Explain one choice and an alternative.",
+          "Give evidence or label missing evidence and how to obtain it.",
+          "Distinguish completed work from plans."
+        ],
+        "interviewer_notes": "No prestige or scale requirements. A labeled proposal is acceptable here, though not evidence of past ownership. Do not demand invented metrics or penalize honest limits.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Defend a decision and a lesson",
+        "prompt": "Using your project or labeled proposal, pick a decision you would revisit. Describe the original constraint, a rejected alternative, evidence that would change your mind, and a small experiment to compare approaches. Explain what you learned (or, for a proposal, intend to learn).",
+        "acceptance_checks": [
+          "Provide a causal explanation, not just a technology list.",
+          "Compare an alternative under the same constraints.",
+          "State a success criterion and a failure criterion.",
+          "Keep all past-tense claims truthful."
+        ],
+        "interviewer_notes": "Accept modest evidence, logs, tests, or qualitative user feedback. A decision is not wrong merely because a newer tool exists. Look for reproducibility and reflection.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "track": "project",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "You lack a measured outcome. What belongs in the answer?",
+        "options": [
+          "An invented percentage",
+          "An explicit evidence gap and measurement plan",
+          "Someone else's result as your own",
+          "A claim of perfect reliability"
+        ],
+        "answer": 1,
+        "explanation": "Honest limitations are better than fabricated evidence."
+      },
+      {
+        "question": "What best explains an architecture choice?",
+        "options": [
+          "A technology list",
+          "Popularity alone",
+          "Constraints, alternatives and evidence",
+          "The longest answer"
+        ],
+        "answer": 2,
+        "explanation": "The reasoning connects the choice to the actual problem."
+      },
+      {
+        "question": "How should you describe team work?",
+        "options": [
+          "Separate your contribution from the team outcome",
+          "Claim everything personally",
+          "Avoid all context",
+          "Invent leadership duties"
+        ],
+        "answer": 0,
+        "explanation": "Specific responsibility supports credible ownership."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "debugging",
+    "title": "Turn a symptom into a regression test",
+    "objectives": [
+      "Reproduce a failure before changing code.",
+      "Test competing hypotheses.",
+      "Fix the cause and preserve a regression case."
+    ],
+    "exercises": [
+      {
+        "title": "The disappearing queue entry",
+        "prompt": "A worker claims the oldest queued job using the code below. Explain the failure, write the smallest safe fix, and show a regression test plus an empty-queue test. Assume one thread owns the list.",
+        "acceptance_checks": [
+          "Identify the failing expression.",
+          "The function returns the removed first item.",
+          "Empty input returns None and remaining order is preserved.",
+          "Give a test that fails before the fix."
+        ],
+        "interviewer_notes": "queue.pop(0) returns the job, but job[0] is only its first character. Return job. Empty queue is already handled. A deque improves pop-left cost but is not necessary for this correctness fix.",
+        "starter_code": "def take_job(queue):\n    if not queue:\n        return None\n    job = queue.pop(0)\n    return job[0]\n\n# take_job([\"job-123\", \"job-456\"]) returns \"j\"",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "The slow service after a release",
+        "prompt": "After deployment, p95 end-to-end latency rises from 2 seconds to 9 seconds. Average processing time and traffic rate appear unchanged; queue wait is not measured. Give three competing hypotheses, measurements that distinguish them, a safe mitigation, and a verification plan. You do not yet know the cause.",
+        "acceptance_checks": [
+          "Do not assert an unobserved root cause.",
+          "Separate queue wait, processing time, and dependency latency.",
+          "Choose measurements that could disprove each hypothesis.",
+          "State a mitigation condition and post-change check."
+        ],
+        "interviewer_notes": "Possibilities include reduced concurrency, burstier arrivals, tail dependency timeouts, or measurement changes. Mean processing time does not rule out a tail problem. More logging alone is not a falsifiable plan.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      }
+    ],
+    "track": "debugging",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "Which is a useful first artifact for a code bug?",
+        "options": [
+          "A rewrite of every module",
+          "A smallest reproducible failing case",
+          "A random dependency upgrade",
+          "A claim that it cannot happen"
+        ],
+        "answer": 1,
+        "explanation": "A reproducer narrows investigation and can become a regression test."
+      },
+      {
+        "question": "Does an unchanged mean rule out worsening p95 latency?",
+        "options": [
+          "Yes",
+          "Only on Tuesdays",
+          "No",
+          "It proves the database failed"
+        ],
+        "answer": 2,
+        "explanation": "Averages and tail percentiles summarize different properties."
+      },
+      {
+        "question": "A hypothesis is useful when:",
+        "options": [
+          "It is impossible to disprove",
+          "It names a popular tool",
+          "It has no observable consequence",
+          "A measurement could distinguish it from alternatives"
+        ],
+        "answer": 3,
+        "explanation": "Discriminating evidence lets you narrow the cause."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "behavioral",
+    "title": "Tell a specific, honest story",
+    "objectives": [
+      "Structure a concise situation/action/result story.",
+      "Describe respectful disagreement.",
+      "Reflect without inventing outcomes or assigning blame."
+    ],
+    "exercises": [
+      {
+        "title": "A disagreement about scope",
+        "prompt": "Describe a real disagreement about scope, quality, or a deadline. State the situation, shared goal, your specific actions, result, and what you would change. If you lack an example, write a labeled hypothetical response and identify what real evidence a future story would need.",
+        "acceptance_checks": [
+          "Explain the other perspective fairly.",
+          "Use specific actions instead of character judgments.",
+          "Distinguish the result from your interpretation.",
+          "Label hypothetical details and unknown outcomes."
+        ],
+        "interviewer_notes": "Assess specificity and reasoning, not personality, employer fit, eloquence or prestige. A hypothetical is allowed here but must never be presented as experience.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      },
+      {
+        "title": "Communicate uncertainty under pressure",
+        "prompt": "Hypothetical scenario: a teammate wants to ship an AI feature tomorrow, but the team has only tested happy paths. Draft a short message stating the evidence gap, a concrete next step and release criterion, while respecting deadline pressure. Explain one tradeoff.",
+        "acceptance_checks": [
+          "Name a specific missing test or failure mode.",
+          "Propose an owner/action and observable release criterion.",
+          "Acknowledge uncertainty without unsupported claims of safety or danger.",
+          "Remain constructive and avoid blame."
+        ],
+        "interviewer_notes": "A staged rollout, narrower scope, targeted tests, monitoring, or justified delay may all be valid. Do not score agreement with a particular management style.",
+        "starter_code": "",
+        "minutes": 15,
+        "constraints": []
+      }
+    ],
+    "track": "behavioral",
+    "stage": "Interview practice",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "What makes a story credible?",
+        "options": [
+          "Specific actions and honest evidence",
+          "Claiming no mistakes",
+          "A famous employer name",
+          "Perfectly memorized slogans"
+        ],
+        "answer": 0,
+        "explanation": "Specificity, ownership and limits matter more than polish."
+      },
+      {
+        "question": "How should a hypothetical be presented?",
+        "options": [
+          "As a real achievement",
+          "Clearly labeled hypothetical",
+          "With invented metrics",
+          "Without acknowledging it"
+        ],
+        "answer": 1,
+        "explanation": "Do not turn a practice scenario into claimed experience."
+      },
+      {
+        "question": "A constructive concern includes:",
+        "options": [
+          "Only blame",
+          "Only certainty",
+          "An observation, action and decision criterion",
+          "No next step"
+        ],
+        "answer": 2,
+        "explanation": "A concrete next step helps the team decide using evidence."
+      }
+    ],
+    "required": true
+  },
+  {
+    "id": "post-training",
+    "title": "Reason about training data and evaluation",
+    "objectives": [
+      "Distinguish supervised examples from preference comparisons.",
+      "Detect leakage and proxy failures.",
+      "Define a held-out check for a training change."
+    ],
+    "exercises": [
+      {
+        "title": "Audit a tiny preference dataset",
+        "prompt": "A fictional preference dataset contains repeated prompts across train and test, and annotators always prefer longer answers. Identify two risks. Propose a split strategy, annotation guidance, and a held-out evaluation of quality rather than length.",
+        "acceptance_checks": [
+          "Identify leakage and length-biased preferences separately.",
+          "Group near-duplicate prompts before splitting.",
+          "Define correctness/usefulness independently of length.",
+          "Compare against a baseline on held-out examples."
+        ],
+        "interviewer_notes": "Accept source/time/group splits if justified. Deduplication does not remove every leakage path. Preference optimization does not guarantee truthfulness.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      },
+      {
+        "title": "Investigate a misleading win rate",
+        "prompt": "After training, a model wins 70% of pairwise judgments but exact task success falls from 82% to 75% on the same held-out tasks. Propose three explanations and an investigation to distinguish them. What evidence would justify calling it an improvement?",
+        "acceptance_checks": [
+          "Consider judge bias, response style, or metric mismatch.",
+          "Do not treat proxy win rate as task correctness.",
+          "Use blind comparisons or controlled checks.",
+          "Report uncertainty and preserve a held-out final decision set."
+        ],
+        "interviewer_notes": "Explanations include style bias, task tradeoffs, labels or sampling noise. No sample size is supplied, so significance is unknown.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      }
+    ],
+    "track": "post-training",
+    "stage": "ML references (optional)",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "What is a risk of near-duplicate train/test prompts?",
+        "options": [
+          "More trustworthy generalization automatically",
+          "No risk",
+          "Evaluation leakage",
+          "Guaranteed correctness"
+        ],
+        "answer": 2,
+        "explanation": "Overlap can make evaluation performance overstate generalization."
+      },
+      {
+        "question": "A higher judge win rate proves task correctness improved:",
+        "options": [
+          "Always",
+          "Only if answers are longer",
+          "Without any other checks",
+          "Not by itself"
+        ],
+        "answer": 3,
+        "explanation": "A proxy can improve while the actual task metric worsens."
+      },
+      {
+        "question": "Good preference guidance should favor:",
+        "options": [
+          "Correctness and usefulness with evidence",
+          "Length regardless of content",
+          "A fixed writing style only",
+          "Invented citations"
+        ],
+        "answer": 0,
+        "explanation": "Label criteria should align with the intended behavior."
+      }
+    ],
+    "required": false
+  },
+  {
+    "id": "research-engineering",
+    "title": "Design an experiment you can trust",
+    "objectives": [
+      "State a falsifiable hypothesis.",
+      "Control confounders.",
+      "Report reproducibility and uncertainty."
+    ],
+    "exercises": [
+      {
+        "title": "Compare two batching policies",
+        "prompt": "Hypothesis: waiting up to 10 ms for larger inference batches improves throughput without increasing p95 end-to-end latency by more than 20 ms. Design a comparison against immediate dispatch: workload, controls, metrics, repeated runs, acceptance rule. No experiment has run.",
+        "acceptance_checks": [
+          "Include queue delay in latency.",
+          "Keep model, hardware, workload and measurement definitions comparable.",
+          "Include warmup and repetitions or another uncertainty estimate.",
+          "Define throughput improvement and latency bounds before observing results."
+        ],
+        "interviewer_notes": "Look for controlled arrivals and task size distributions, throughput units, sufficient load, and explicit limits. Do not invent gains.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      },
+      {
+        "title": "Explain an unstable benchmark",
+        "prompt": "Baseline runs score 80, 82, 81; treatment runs score 79, 86, 81 on an unspecified metric. Explain what can and cannot be concluded. Plan next measurements and reproducibility artifacts.",
+        "acceptance_checks": [
+          "Compute baseline mean 81 and treatment mean 82.",
+          "Acknowledge variability and missing task details.",
+          "Do not claim significance from means alone.",
+          "Record code/config/data versions, seeds, environment and raw results."
+        ],
+        "interviewer_notes": "One-point average gain is not convincing evidence by itself. Controlled repetitions, paired tasks, failure analysis and uncertainty estimates are appropriate.",
+        "starter_code": "",
+        "minutes": 20,
+        "constraints": []
+      }
+    ],
+    "track": "research-engineering",
+    "stage": "ML references (optional)",
+    "minutes": 30,
+    "checks": [
+      {
+        "question": "Why keep hardware and workload comparable?",
+        "options": [
+          "To eliminate all uncertainty",
+          "To reduce confounding in the comparison",
+          "To guarantee significance",
+          "To remove the baseline"
+        ],
+        "answer": 1,
+        "explanation": "Otherwise differences may come from factors other than the intended change."
+      },
+      {
+        "question": "Means 81 and 82 from three runs each establish a reliable gain:",
+        "options": [
+          "Always",
+          "If you omit the worst run",
+          "Not without considering variability and the experimental design",
+          "If the model says so"
+        ],
+        "answer": 2,
+        "explanation": "Small observed differences require uncertainty and context."
+      },
+      {
+        "question": "What should a reproducibility record include?",
+        "options": [
+          "Only the best score",
+          "Only screenshots",
+          "Only a claim of success",
+          "Versions, configuration, workload and raw results"
+        ],
+        "answer": 3,
+        "explanation": "Another engineer needs the conditions and observations, not just the conclusion."
+      }
+    ],
+    "required": false
+  }
+]

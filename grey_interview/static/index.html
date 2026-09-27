@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Production AI engineering, Python, DSA and applied interview practice.">
+  <title>Grey — Learning workspace</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23151f32'/%3E%3Ctext x='10' y='29' fill='%235ee0bf' font-family='sans-serif' font-size='28'%3EG%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/app.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="#/learn"><span class="brand-mark">g.</span><span>GREY<small>INTERVIEW LAB</small></span></a>
+      <nav class="main-nav" aria-label="Main"><a href="#/learn" data-nav="learn">Learn</a><a href="#/practice" data-nav="practice">Practice</a><a href="#/readiness" data-nav="readiness">Readiness</a><a href="#/sessions" data-nav="sessions">Sessions</a></nav>
+      <div class="course-label">YOUR LEARNING PATH</div>
+      <nav id="course-nav" aria-label="Lessons"><span class="muted">Loading lessons…</span></nav>
+      <div class="sidebar-footer"><span class="local-label">LOCAL WORKSPACE</span><div id="provider-info"></div></div>
+    </aside>
+    <div class="main-shell">
+      <header class="topbar"><span id="breadcrumb">Learning workspace</span><a href="#/readiness" class="text-link">View readiness <span aria-hidden="true">↗</span></a></header>
+      <div id="busy" class="busy" role="status" hidden><span class="spinner"></span><span id="busy-text">Working…</span></div>
+      <div id="notice" class="notice" role="alert" hidden></div>
+      <div class="mobile-courses"><label for="mobile-lesson">Choose a lesson</label><select id="mobile-lesson"></select></div>
+      <main id="main" tabindex="-1"><div class="loading-state">Opening your workspace…</div></main>
+    </div>
+  </div>
+  <noscript>This workspace needs JavaScript for the editor and saved progress. The CLI remains available with grey learn.</noscript>
+</body>
+</html>

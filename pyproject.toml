@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grey-interview"
+version = "0.1.0"
+description = "Adaptive AI systems interview practice for Grey"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=2.0,<3",
+    "openai-codex>=0.154,<0.155",
+    "pydantic>=2.8,<3",
+    "python-dotenv>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1", "httpx>=0.27,<1"]
+
+[project.scripts]
+grey = "grey_interview.cli:main"
+
+[tool.setuptools.package-data]
+grey_interview = ["prompts/*.md", "curriculum/*.md", "curriculum/*.json", "static/*.html", "static/*.css", "static/assets/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100

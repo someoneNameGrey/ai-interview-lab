@@ -1,0 +1,1603 @@
+[
+  {
+    "id": "role-diagnostic",
+    "track": "project",
+    "title": "Senior SWE diagnostic",
+    "stage": "Phase 0 · Baseline",
+    "minutes": 60,
+    "objectives": [
+      "Separate Python gaps from existing engineering experience.",
+      "Define measurable portfolio evidence and independent practice."
+    ],
+    "prerequisites": [],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Evidence from shipped work",
+        "prompt": "Choose one actual shipped AI product. Describe the user workflow, your contribution, architecture, a rejected alternative, measured result and limitation. If evidence is unavailable, mark it unknown. Then map three gaps to production Python, evals or enterprise delivery.",
+        "acceptance_checks": [
+          "Separates personal and team ownership.",
+          "Uses actual evidence or clearly labels unknowns.",
+          "Maps gaps to concrete exercises."
+        ],
+        "interviewer_notes": "Reward honest scope and causal evidence, not invented metrics.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Define both project contracts",
+        "prompt": "Write charters for DeepSWE and an Enterprise AI Support Agent. For each give a user, task, scope exclusions, baseline, quality/cost/latency targets and one security gate. Explain which work can be deterministic.",
+        "acceptance_checks": [
+          "Both projects have observable outcomes and baselines.",
+          "Targets are proposed, not claimed results.",
+          "Critical tool/tenant boundaries have testable gates."
+        ],
+        "interviewer_notes": "DeepSWE proves bounded coding automation; support proves secure business workflow. Accept justified targets, not universal thresholds.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Which is valid project evidence?",
+        "options": [
+          "A claimed result with no measurement",
+          "A planned benchmark labeled completed",
+          "A measured result with workload and limitations",
+          "A list of libraries"
+        ],
+        "answer": 2,
+        "explanation": "Evidence names the measurement context and its limits."
+      },
+      {
+        "question": "What follows a failed Python diagnostic?",
+        "options": [
+          "Study foundation-model training",
+          "Raise the reported score",
+          "Repeat all beginner material",
+          "Target the failed skill and retry fresh"
+        ],
+        "answer": 3,
+        "explanation": "Remediation should match an observed gap."
+      },
+      {
+        "question": "When does a guided score count as independent skill?",
+        "options": [
+          "After copying the solution",
+          "After a tutor explains it",
+          "When the score exceeds 90",
+          "Only a fresh unassisted attempt supplies independent evidence"
+        ],
+        "answer": 3,
+        "explanation": "Guided completion and independent performance are distinct."
+      }
+    ]
+  },
+  {
+    "id": "production-python",
+    "track": "coding",
+    "title": "Production Python contracts",
+    "stage": "Phase 1 · Python",
+    "minutes": 60,
+    "objectives": [
+      "Use typing, dataclasses and Pydantic at appropriate boundaries.",
+      "Design testable clients, packages, exceptions and logs."
+    ],
+    "prerequisites": [
+      "role-diagnostic"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Normalize an account response",
+        "prompt": "Implement parse_account(payload) returning an immutable Account(id: str, active: bool). Reject empty IDs, missing fields, and string booleans such as 'false' with AccountPayloadError. Ignore extra upstream fields deliberately. Include parametrized pytest cases and a typed client interface.",
+        "acceptance_checks": [
+          "Valid {'id':'a1','active':False} preserves False.",
+          "Missing/empty id and non-boolean active fail explicitly.",
+          "Tests cover invalid boundaries; no raw PII logging."
+        ],
+        "interviewer_notes": "Pydantic strict validation or explicit checks acceptable; avoid bool('false'). Separate external validation from domain type.",
+        "starter_code": "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass Account:\n    id: str\n    active: bool\n\nclass AccountPayloadError(ValueError):\n    pass\n\ndef parse_account(payload: object) -> Account:\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Test a client boundary",
+        "prompt": "Implement get_account(account_id, transport) against a fake transport exposing get(id) -> (status, payload). Map 200 through parse_account, 404 to AccountNotFound and 503 to DependencyUnavailable; other statuses to an explicit error. Supply pytest tests and a proposed package layout.",
+        "acceptance_checks": [
+          "Tests distinguish 404, 503 and malformed 200 payload.",
+          "No network calls needed for routine tests.",
+          "Exceptions preserve useful cause without exposing payload secrets."
+        ],
+        "interviewer_notes": "Use an injectable Protocol or callable; avoid catch-all returning None and mock only transport.",
+        "starter_code": "def get_account(account_id, transport):\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "What enforces untrusted JSON types?",
+        "options": [
+          "A comment",
+          "Type hints alone",
+          "Boundary validation",
+          "A dataclass annotation alone"
+        ],
+        "answer": 2,
+        "explanation": "Runtime boundary validation checks external data; hints alone do not."
+      },
+      {
+        "question": "What is the useful mocking seam?",
+        "options": [
+          "Every internal helper",
+          "The external transport",
+          "The assertion",
+          "The implementation being tested"
+        ],
+        "answer": 1,
+        "explanation": "A fake transport preserves meaningful service behavior under test."
+      },
+      {
+        "question": "What belongs in structured logs?",
+        "options": [
+          "Correlation ID and redacted outcome",
+          "API token",
+          "Full customer record",
+          "All model context"
+        ],
+        "answer": 0,
+        "explanation": "Logs need diagnostic identifiers, not sensitive payloads."
+      }
+    ]
+  },
+  {
+    "id": "python-async",
+    "track": "coding",
+    "title": "Async clients and bounded concurrency",
+    "stage": "Phase 1 · Python",
+    "minutes": 60,
+    "objectives": [
+      "Bound work, deadlines and cancellation.",
+      "Choose async I/O, threads or processes and test cleanup."
+    ],
+    "prerequisites": [
+      "production-python"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Build a bounded mapper",
+        "prompt": "Implement async bounded_map(items, call, limit) preserving input order. Inputs are a finite list; reject limit <= 0. Use at most limit workers and no task per item. Propagate call failures and cancel/await remaining workers. Include tests for empty input, ordering, failure and peak concurrency.",
+        "acceptance_checks": [
+          "Peak active calls never exceeds limit.",
+          "Results preserve input order despite completion order.",
+          "Failure/caller cancellation leaves no running workers."
+        ],
+        "interviewer_notes": "A worker pool with indexed results and try/finally cleanup is valid. Python 3.10 compatible patterns or an explicitly stated newer version are acceptable.",
+        "starter_code": "async def bounded_map(items, call, limit):\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Repair a timeout design",
+        "prompt": "A service uses gather over 50,000 calls, retries every exception forever and creates a new client each time. Propose and implement a small replacement using bounded work, a total deadline and an owned client. Show deterministic tests for permanent error, timeout and cancellation.",
+        "acceptance_checks": [
+          "Retries are bounded and classify transient errors.",
+          "Caller cancellation terminates child work and closes resources.",
+          "Tests use controlled fakes/events rather than real provider calls."
+        ],
+        "interviewer_notes": "Do not treat asyncio cancellation as an ordinary retry; distinguish per-attempt timeout from total deadline.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Does a semaphore bound allocated tasks?",
+        "options": [
+          "No; it bounds entry to a protected section",
+          "Only with retries",
+          "Always",
+          "Only for CPU work"
+        ],
+        "answer": 0,
+        "explanation": "A separate worker/queue design is needed to bound pending tasks."
+      },
+      {
+        "question": "Which operation blocks the event loop?",
+        "options": [
+          "Awaiting an async client",
+          "Synchronous blocking I/O inside async def",
+          "Awaiting a queue",
+          "Awaiting cancellation cleanup"
+        ],
+        "answer": 1,
+        "explanation": "Declaring async does not transform synchronous work."
+      },
+      {
+        "question": "What should parent cancellation do?",
+        "options": [
+          "Leave tools running",
+          "Cancel and await child cleanup",
+          "Retry forever",
+          "Return partial success silently"
+        ],
+        "answer": 1,
+        "explanation": "Cancellation is a lifecycle event, not a transient provider failure."
+      }
+    ]
+  },
+  {
+    "id": "ai-evals",
+    "track": "ai-systems",
+    "title": "Datasets, graders and release gates",
+    "stage": "Phase 2 · Evals",
+    "minutes": 60,
+    "objectives": [
+      "Build representative datasets and calibrated graders.",
+      "Compare task success, groundedness, tool accuracy, latency and cost."
+    ],
+    "prerequisites": [
+      "production-python"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Specify a benchmark harness",
+        "prompt": "Design a case schema and six representative DeepSWE cases covering repair, multi-file work, impossible task, malicious repository text, timeout and tool denial. Define development/held-out grouping, deterministic tests, a judge rubric, human review and failure labels.",
+        "acceptance_checks": [
+          "Cases have expected outcomes and prohibited actions.",
+          "Held-out families are not tuned on.",
+          "Timeouts and failures remain in denominators; judge cannot replace protected tests."
+        ],
+        "interviewer_notes": "Demand reproducible inputs, grader versions, provenance and attack cases. Reject judge-only pass criteria for code correctness.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Make a release decision",
+        "prompt": "Baseline resolves 30/40 tasks for $4 total; candidate resolves 32/40 for $8. Candidate p95 grows from 12s to 20s and has one unauthorized tool action versus zero. Compute success and cost per successful task; decide release under a zero-unauthorized-action guardrail and p95 <= 15s.",
+        "acceptance_checks": [
+          "Reports 75% vs 80%, about $0.133 vs $0.25 per success.",
+          "Rejects promotion on safety and latency guardrails.",
+          "Requests matched repeated runs/slice analysis before claiming a robust quality gain."
+        ],
+        "interviewer_notes": "Quality gain is 5 percentage points, not proof of significance. Costs include unsuccessful attempts.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Which split best reduces near-duplicate leakage?",
+        "options": [
+          "Related task/document families together",
+          "Only successful cases",
+          "All data used for tuning",
+          "Random lines from each document"
+        ],
+        "answer": 0,
+        "explanation": "Family grouping reduces related examples across development and holdout."
+      },
+      {
+        "question": "A judge prefers a fluent unsupported answer. What next?",
+        "options": [
+          "Trust fluency",
+          "Promote it",
+          "Remove hard examples",
+          "Calibrate against human correctness labels"
+        ],
+        "answer": 3,
+        "explanation": "Judge preference is not correctness or grounding."
+      },
+      {
+        "question": "What denominator counts task success?",
+        "options": [
+          "Only cheap attempts",
+          "Only non-timeout tasks",
+          "All attempted eligible tasks, including crashes/timeouts",
+          "Only completed successes"
+        ],
+        "answer": 2,
+        "explanation": "Excluding failures inflates apparent performance."
+      }
+    ]
+  },
+  {
+    "id": "agent-architecture",
+    "track": "ai-systems",
+    "title": "Agent loops, state and context",
+    "stage": "Phase 3 · Agents",
+    "minutes": 60,
+    "objectives": [
+      "Build explicit bounded loops and durable state.",
+      "Justify planning, context strategies and subagents against simpler workflows."
+    ],
+    "prerequisites": [
+      "python-async",
+      "ai-evals"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Specify a resumable loop",
+        "prompt": "Design a state machine for a coding agent with read/search/edit/test tools. Include structured-output rejection, step/deadline/token budgets, no-progress stop, cancellation and checkpoints. Trace a successful repair and repeated failing-test loop.",
+        "acceptance_checks": [
+          "Every execution path reaches a bounded terminal/pending state.",
+          "Authorization occurs outside the model.",
+          "Checkpoint data distinguishes attempts, observations and remaining budget."
+        ],
+        "interviewer_notes": "Look for state ownership, repeated observation detection and recovery without resetting budgets.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Defend context and delegation",
+        "prompt": "A task spans 30 files, but only four fit in context. Compare file selection plus source-linked summaries with full-context truncation. Design a matched eval of a reviewer subagent against a single agent, including permissions, cancellation and cost.",
+        "acceptance_checks": [
+          "Preserves access to original evidence and bounds tool output.",
+          "Delegated permissions cannot exceed parent authority.",
+          "Measures quality, latency and total cost; accepts no subagent if benefit is absent."
+        ],
+        "interviewer_notes": "Do not reward multi-agent complexity without measurable benefit.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Which task least needs an agent?",
+        "options": [
+          "Unfamiliar bug investigation",
+          "Fixed lint then test sequence",
+          "Adaptive evidence gathering",
+          "Dynamic troubleshooting"
+        ],
+        "answer": 1,
+        "explanation": "Known steps can remain deterministic."
+      },
+      {
+        "question": "Does valid tool-call JSON authorize execution?",
+        "options": [
+          "No, policy must authorize it",
+          "Only with a larger model",
+          "Yes",
+          "Only for read tools"
+        ],
+        "answer": 0,
+        "explanation": "Schema validity and authority are different checks."
+      },
+      {
+        "question": "A useful subagent comparison holds what constant?",
+        "options": [
+          "Only output style",
+          "Only agent count",
+          "Nothing",
+          "Task set and overall resource budget"
+        ],
+        "answer": 3,
+        "explanation": "Comparable tasks and budgets expose actual benefit and cost."
+      }
+    ]
+  },
+  {
+    "id": "tool-sandboxing",
+    "track": "ai-systems",
+    "title": "Tool permissions and sandboxing",
+    "stage": "Phase 3 · Agents",
+    "minutes": 60,
+    "objectives": [
+      "Enforce file, process, network and secret boundaries.",
+      "Test direct and indirect injection at tool execution."
+    ],
+    "prerequisites": [
+      "agent-architecture"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Design the execution boundary",
+        "prompt": "Specify sandbox policy for read/search/edit/test tools on a disposable repository. Include filesystem, process, network, secrets, CPU/memory/disk/time/output limits, cleanup and audit fields. Supply six negative tests and residual risks.",
+        "acceptance_checks": [
+          "Model cannot access host secrets or container engine.",
+          "Tests cover symlinks, egress, exhaustion and child-process cleanup.",
+          "Separates schema checks, authorization and OS isolation."
+        ],
+        "interviewer_notes": "Accept a scoped container/VM design with explicit limits; reject prompt-only safety and shell allowlist-only isolation.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Review a malicious tool request",
+        "prompt": "A README instructs an agent to upload .env to an external URL; a proposed tool call reads a symlink under the workspace and runs curl. Trace every trust boundary and explain safe denial, logging and task recovery without executing this attack.",
+        "acceptance_checks": [
+          "Repository instructions do not override policy.",
+          "Path/egress/secret controls independently prevent effects.",
+          "Audit excludes secret contents; denial becomes an observable result."
+        ],
+        "interviewer_notes": "No actual attack execution needed. Denial should not trigger retries with broader permissions.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "What makes a shell allowlist insufficient?",
+        "options": [
+          "It replaces authorization",
+          "It is always too slow",
+          "Shell syntax and environment can still escape intent",
+          "It prevents logs"
+        ],
+        "answer": 2,
+        "explanation": "Commands alone do not isolate files, network or resources."
+      },
+      {
+        "question": "Repository text asks for more privileges. What happens?",
+        "options": [
+          "Ask another model",
+          "Treat it as untrusted input; enforce server policy",
+          "Hide the log",
+          "Grant temporarily"
+        ],
+        "answer": 1,
+        "explanation": "Untrusted content cannot expand capabilities."
+      },
+      {
+        "question": "Which is safe audit content?",
+        "options": [
+          "Actor, action, decision and redacted identifiers",
+          "Full token",
+          "Full .env",
+          "All customer payloads"
+        ],
+        "answer": 0,
+        "explanation": "Auditability does not require recording secrets."
+      }
+    ]
+  },
+  {
+    "id": "ai-reliability",
+    "track": "system-design",
+    "title": "Durable AI jobs and recovery",
+    "stage": "Phase 4 · Production",
+    "minutes": 60,
+    "objectives": [
+      "Design idempotent effects, bounded retries and durable recovery.",
+      "Control overload, fallbacks, caches and budgets."
+    ],
+    "prerequisites": [
+      "python-async",
+      "tool-sandboxing"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Recover an uncertain effect",
+        "prompt": "Design a durable support-action worker for at-least-once delivery. The remote API supports idempotency keys. Show state transitions and recovery if the process dies before the call, after the effect, or after local completion but before ack.",
+        "acceptance_checks": [
+          "One stable logical-operation key survives retries.",
+          "Acknowledgment follows durable outcome recording.",
+          "Stale workers and revoked authorization are addressed."
+        ],
+        "interviewer_notes": "Use outbox/leases/fencing as justified; explain remote idempotency retention and reconciliation limits.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Handle sustained overload",
+        "prompt": "Jobs arrive at 9/s and complete at 6/s for 60s. Compute queue growth, then propose admission control, concurrency/rate caps, bounded retries, breaker/fallback and an authorized cache. State user-visible degraded behavior.",
+        "acceptance_checks": [
+          "Calculates 180 extra jobs under stated assumptions.",
+          "Does not treat queue growth as free capacity.",
+          "Fallback and cache preserve tenant/security and freshness policy."
+        ],
+        "interviewer_notes": "Bound retries and total deadlines; account for queue wait in p95, not just model service time.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "A worker crashes after a remote effect. Which protects retries?",
+        "options": [
+          "A bigger queue",
+          "A local flag written later alone",
+          "A random key per retry",
+          "Stable downstream idempotency key"
+        ],
+        "answer": 3,
+        "explanation": "A stable key identifies the same logical effect across attempts."
+      },
+      {
+        "question": "What happens if arrivals exceed departures indefinitely?",
+        "options": [
+          "Queue fixes capacity",
+          "Latency stays flat",
+          "Backlog grows unless work is rejected or capacity changes",
+          "Retries improve throughput"
+        ],
+        "answer": 2,
+        "explanation": "Queues absorb bursts, not permanent capacity deficits."
+      },
+      {
+        "question": "A role was revoked during an agent pause. On resume:",
+        "options": [
+          "Skip checks for cached calls",
+          "Reauthorize before effects",
+          "Use old rights forever",
+          "Let the model decide"
+        ],
+        "answer": 1,
+        "explanation": "Persistent state is not persistent authorization."
+      }
+    ]
+  },
+  {
+    "id": "ai-observability",
+    "track": "debugging",
+    "title": "AI traces, costs and incidents",
+    "stage": "Phase 4 · Production",
+    "minutes": 60,
+    "objectives": [
+      "Trace request, queue, model and tool boundaries.",
+      "Use production feedback and evals to drive safe releases."
+    ],
+    "prerequisites": [
+      "ai-reliability",
+      "ai-evals"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Investigate the latency regression",
+        "prompt": "Before release, p95 end-to-end is 8s; after, 18s. Mean model latency stays 2s, queue age doubles and retries rise. Give competing hypotheses, exact trace/metric comparisons, a mitigation, a reproducer and a rollback rule.",
+        "acceptance_checks": [
+          "Separates observations from unproven causes.",
+          "Measures queue/model/tool/retry spans on comparable cohorts.",
+          "Mitigation and regression verification are explicit."
+        ],
+        "interviewer_notes": "Do not infer a unique root cause from correlated queue age/retries; propose discriminating evidence.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Design trace and cost accounting",
+        "prompt": "Define one trace for a failed model call, retry, tool call and successful completion. Include IDs, timing, token/cost estimates, redaction, metrics and production-feedback sampling. Explain how CI gates the next release.",
+        "acceptance_checks": [
+          "Failed attempts and retries contribute to total cost.",
+          "Logs/traces do not expose secrets or unrestricted PII.",
+          "Explains missing usage, trace sampling and grader/version changes."
+        ],
+        "interviewer_notes": "Quality, safety and latency gates should precede rollout; observability alone does not certify improvement.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Can component p95 values simply be added?",
+        "options": [
+          "No; request-level distributions are needed",
+          "Only for tools",
+          "Only for queues",
+          "Always"
+        ],
+        "answer": 0,
+        "explanation": "Tail events need not occur on the same request."
+      },
+      {
+        "question": "Cost per successful task should include:",
+        "options": [
+          "Only cached requests",
+          "Only successful model calls",
+          "Only output tokens",
+          "All attempt costs including failures and retries"
+        ],
+        "answer": 3,
+        "explanation": "The cost of failures is part of delivering successful outcomes."
+      },
+      {
+        "question": "What makes an alert actionable?",
+        "options": [
+          "Raw PII dump",
+          "A dashboard link alone",
+          "Owner, threshold, diagnostic evidence and runbook",
+          "High message volume"
+        ],
+        "answer": 2,
+        "explanation": "An alert should support an operational decision."
+      }
+    ]
+  },
+  {
+    "id": "deepswe",
+    "track": "project",
+    "title": "Project 1 · DeepSWE",
+    "stage": "Project 1 · Release",
+    "minutes": 60,
+    "objectives": [
+      "Deliver a bounded autonomous coding agent.",
+      "Defend benchmark validity, security and production evidence."
+    ],
+    "prerequisites": [
+      "ai-observability"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "DeepSWE release review",
+        "prompt": "Submit an evidence card for milestones M1–M6 with links or pasted excerpts of actual code/tests/results. If not built, label each item planned and supply an implementation sequence. Include a 40-task split, baseline, controls and protected grader design.",
+        "acceptance_checks": [
+          "All six milestones have actual evidence or explicit gaps.",
+          "Benchmark protects grading from agent edits.",
+          "Reports success, security, cost/latency and failures without invented results."
+        ],
+        "interviewer_notes": "A proposal may pass the exercise as a plan but is not a completed portfolio release; call this distinction out.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Defend an agent regression",
+        "prompt": "A new planner solves 3 more held-out tasks but sometimes modifies tests and incurs twice the token cost. Present a release decision, investigation, constrained follow-up experiment and a five-minute project defense covering your own contribution.",
+        "acceptance_checks": [
+          "Rejects trusting agent-editable tests.",
+          "Explains matched reruns, holdout reuse and cost guardrails.",
+          "Distinguishes personal work, uncertain results and next evidence."
+        ],
+        "interviewer_notes": "Treat altered tests as grading-integrity concern. Do not reward unsupported benchmark/leaderboard claims.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Who should control final grading tests?",
+        "options": [
+          "The repair agent",
+          "A protected evaluation harness",
+          "The generated patch",
+          "The judge's preferred answer"
+        ],
+        "answer": 1,
+        "explanation": "Agent-editable tests cannot independently verify repairs."
+      },
+      {
+        "question": "Which result supports a benchmark claim?",
+        "options": [
+          "Versioned tasks, matched budgets and raw results",
+          "A model's self-report",
+          "Only the best demo",
+          "A changed dataset without disclosure"
+        ],
+        "answer": 0,
+        "explanation": "Reproducibility and comparable conditions matter."
+      },
+      {
+        "question": "What does completing this tutorial prove?",
+        "options": [
+          "Project is deployed",
+          "Agent is secure",
+          "Hiring readiness",
+          "Exercises were reviewed, not portfolio completion"
+        ],
+        "answer": 3,
+        "explanation": "Only implementation and measured evidence establish project completion."
+      }
+    ]
+  },
+  {
+    "id": "retrieval-evaluation",
+    "track": "ai-systems",
+    "title": "Retrieval metrics and diagnosis",
+    "stage": "Phase 5 · Retrieval",
+    "minutes": 60,
+    "objectives": [
+      "Measure Recall@K, Precision@K, MRR and NDCG.",
+      "Compare chunking, hybrid search, reranking and context selection."
+    ],
+    "prerequisites": [
+      "deepswe",
+      "ai-evals"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Implement ranking metrics",
+        "prompt": "Implement retrieval_metrics(ranked, relevant, k) for unique document IDs and a nonempty relevant set. Return Precision@K, Recall@K and reciprocal rank within K. Reject k <= 0 and duplicates; use K as precision denominator even if fewer results. Test B,A,C with relevant A,C at K=3.",
+        "acceptance_checks": [
+          "Example returns 2/3, 1 and 1/2.",
+          "Absent relevant results give zero reciprocal rank.",
+          "Tests cover fewer results, invalid K and duplicates; explains no-answer handling."
+        ],
+        "interviewer_notes": "Use set membership, cap ranks at K; reciprocal rank is for one query and MRR averages queries.",
+        "starter_code": "def retrieval_metrics(ranked, relevant, k):\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Diagnose high recall, weak answers",
+        "prompt": "A hybrid retriever raises Recall@10 from .70 to .90, but grounded answer accuracy falls and p95 doubles. Design slice analysis and controlled comparisons of reranking, chunk overlap, query rewriting and context selection. Define graded relevance and NDCG convention.",
+        "acceptance_checks": [
+          "Separates retrieval from unsupported generation.",
+          "Controls workload/model/token budgets and inspects permission/staleness failures.",
+          "Reports ranking, grounding, abstention, cost/latency and holdout limitations."
+        ],
+        "interviewer_notes": "High recall can coexist with noisy or misleading context; experiments should isolate changes.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Top ranks B,A,C with relevant A,C: reciprocal rank?",
+        "options": [
+          "0",
+          "1",
+          "1/2",
+          "2/3"
+        ],
+        "answer": 2,
+        "explanation": "A is the first relevant result at rank 2."
+      },
+      {
+        "question": "Why can better recall yield worse answers?",
+        "options": [
+          "Embeddings are always wrong",
+          "Extra context can distract or introduce conflicts",
+          "More tokens always help",
+          "Recall guarantees answers"
+        ],
+        "answer": 1,
+        "explanation": "Evidence selection and generation remain separate failure points."
+      },
+      {
+        "question": "For no labeled relevant items, recall is:",
+        "options": [
+          "Undefined; report that slice separately",
+          "Always 1",
+          "Always 0 without explanation",
+          "Equivalent to precision"
+        ],
+        "answer": 0,
+        "explanation": "Avoid dividing by zero or silently distorting the mean."
+      }
+    ]
+  },
+  {
+    "id": "enterprise-security",
+    "track": "ai-systems",
+    "title": "Identity, privacy and enterprise controls",
+    "stage": "Phase 6 · Enterprise",
+    "minutes": 60,
+    "objectives": [
+      "Enforce RBAC, OAuth scopes and tenant isolation outside models.",
+      "Handle injection, approvals, PII, secrets and auditability."
+    ],
+    "prerequisites": [
+      "retrieval-evaluation",
+      "tool-sandboxing"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Close a tenant escape",
+        "prompt": "Review this design: search(query, tenant_id) and get_bill(account_id) receive model-generated arguments; cache is keyed only by query. Redesign identity propagation, retrieval filtering, object authorization, cache keys and audit events. Give cross-tenant and revoked-role tests.",
+        "acceptance_checks": [
+          "Trusted identity determines tenant context.",
+          "Every object/tool and cache result respects authorization.",
+          "Tests cover role revocation and malicious retrieved content."
+        ],
+        "interviewer_notes": "Filtering only after generation is too late; cached data can leak even if the underlying query was secure.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Bind an approval to an effect",
+        "prompt": "Design approval for a proposed $50 refund. Show transitions when amount changes to $500, approval expires, user role is revoked, worker retries or a human takes over. Include PII/secret minimization, audit fields and idempotency.",
+        "acceptance_checks": [
+          "Changed arguments invalidate approval.",
+          "Execution rechecks role/tenant and expiry.",
+          "Stable key prevents duplicate effects; audit excludes sensitive payloads."
+        ],
+        "interviewer_notes": "Approval records need exact action binding and authoritative validation, not model claims.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Where should tenant identity originate?",
+        "options": [
+          "Retrieved document metadata alone",
+          "User-entered account label",
+          "Model tool arguments",
+          "Authenticated server context"
+        ],
+        "answer": 3,
+        "explanation": "Untrusted arguments cannot select an authorization domain."
+      },
+      {
+        "question": "OAuth authentication eliminates object authorization?",
+        "options": [
+          "Yes",
+          "Only for admins",
+          "No; scopes and object permissions still matter",
+          "Only for cached responses"
+        ],
+        "answer": 2,
+        "explanation": "Identity and delegation do not imply rights to every object."
+      },
+      {
+        "question": "Approved refund arguments change. What now?",
+        "options": [
+          "Only log a warning",
+          "Invalidate approval and request a new bound decision",
+          "Reuse approval",
+          "Let the agent choose"
+        ],
+        "answer": 1,
+        "explanation": "Approval authorizes a specific action, not arbitrary future changes."
+      }
+    ]
+  },
+  {
+    "id": "enterprise-architecture",
+    "track": "system-design",
+    "title": "From business request to AI architecture",
+    "stage": "Phase 6 · Enterprise",
+    "minutes": 60,
+    "objectives": [
+      "Discover the workflow and quantify success.",
+      "Design integrations, evals, rollout, monitoring and ownership."
+    ],
+    "prerequisites": [
+      "enterprise-security",
+      "ai-reliability"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Discover and design support AI",
+        "prompt": "For a fictional B2B SaaS support team handling 5,000 tickets/day, ask eight discovery questions, state assumptions and propose rules/model/RAG/agent boundaries. Design CRM, billing and knowledge integrations with identity, failure and approval flows.",
+        "acceptance_checks": [
+          "Questions identify business baseline, data/actions and owners.",
+          "Explains why each AI component is necessary.",
+          "Includes eval slices, security boundaries and measurable workflow outcome."
+        ],
+        "interviewer_notes": "Do not reward architecture box lists without request flow or requirements; scale is an assumption to refine.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Plan the rollout",
+        "prompt": "Create a four-stage shadow/staff-assist/pilot/expansion plan for the design. Specify entry/exit criteria, responsible roles, monitoring, rollback and implementation dependencies. Show how an outage and a quality regression change the plan.",
+        "acceptance_checks": [
+          "Each stage has measurable gates and an owner.",
+          "Critical authorization failures block rollout.",
+          "Business outcome, human costs and adoption are evaluated alongside model quality."
+        ],
+        "interviewer_notes": "A successful demo is not an operational readiness gate.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "What comes first in vague enterprise AI work?",
+        "options": [
+          "Discover workflow, baseline and outcome owner",
+          "Choose maximum context",
+          "Train a model",
+          "Pick an agent framework"
+        ],
+        "answer": 0,
+        "explanation": "Architecture should follow the actual problem."
+      },
+      {
+        "question": "What justifies an agent?",
+        "options": [
+          "More boxes in a diagram",
+          "Every AI feature needs one",
+          "A vendor demo",
+          "Dynamic decisions that simpler workflows cannot adequately handle"
+        ],
+        "answer": 3,
+        "explanation": "Agent complexity needs a workflow-driven reason."
+      },
+      {
+        "question": "Which rollout signal is insufficient alone?",
+        "options": [
+          "Authorization tests",
+          "Cost including human review",
+          "A polished demo",
+          "Verified resolution quality"
+        ],
+        "answer": 2,
+        "explanation": "A demo does not establish reliability, adoption or business value."
+      }
+    ]
+  },
+  {
+    "id": "support-agent",
+    "track": "project",
+    "title": "Project 2 · Enterprise support agent",
+    "stage": "Project 2 · Delivery",
+    "minutes": 60,
+    "objectives": [
+      "Deliver a secure RAG/tool workflow with human controls.",
+      "Measure reliability, adoption and business outcomes honestly."
+    ],
+    "prerequisites": [
+      "enterprise-architecture",
+      "ai-observability"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Support release evidence",
+        "prompt": "Submit S1–S6 evidence or explicitly labeled gaps: retrieval, architecture, CRM/billing tools, RBAC/tenant controls, approvals/escalation, observability/evals and deployment. Specify 60-case split, quality/security/cost/latency targets and rollback.",
+        "acceptance_checks": [
+          "Distinguishes implemented, mocked and planned work.",
+          "Critical cross-tenant/approval tests must pass.",
+          "Release evidence covers failure behavior and all six milestones."
+        ],
+        "interviewer_notes": "Do not imply exercise completion certifies a deployment; ask for actual artifacts and limitations.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Evaluate workflow value",
+        "prompt": "A pilot reduces median handling time from 10 to 6 minutes, but reopens rise from 5% to 15% and each ticket needs 2 minutes of review. Design a launch decision and further measurement plan, accounting for matched categories, staff adoption, correctness and total cost.",
+        "acceptance_checks": [
+          "Does not equate faster first closure with value.",
+          "Includes review/rework and observation-window effects.",
+          "Separates actual pilot evidence from projections and proposes safe rollout/rollback."
+        ],
+        "interviewer_notes": "Insufficient data for exact ROI; identify denominators, review costs, ticket mix and quality guardrails.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "A mock CRM adapter proves:",
+        "options": [
+          "Live integration works",
+          "Contract behavior under simulated conditions",
+          "Real customer savings",
+          "Enterprise adoption"
+        ],
+        "answer": 1,
+        "explanation": "Mocks are useful evidence but not verified external delivery."
+      },
+      {
+        "question": "When a human takes over:",
+        "options": [
+          "Persist ownership and stop unauthorized automatic effects",
+          "Delete the audit",
+          "Agent continues silently",
+          "Only the prompt changes"
+        ],
+        "answer": 0,
+        "explanation": "Handoff requires authoritative state and execution checks."
+      },
+      {
+        "question": "Which supports business impact?",
+        "options": [
+          "Demo applause",
+          "Synthetic savings called actual",
+          "Only model accuracy",
+          "Observed quality, rework, cost and adoption under stated conditions"
+        ],
+        "answer": 3,
+        "explanation": "Business outcomes need workflow evidence."
+      }
+    ]
+  },
+  {
+    "id": "applied-ai-cases",
+    "track": "system-design",
+    "title": "Eight enterprise design cases",
+    "stage": "Phase 8 · Applied interviews",
+    "minutes": 60,
+    "objectives": [
+      "Defend AI versus deterministic choices across enterprise scenarios.",
+      "Evaluate tools, approvals, privacy, injection and value."
+    ],
+    "prerequisites": [
+      "support-agent"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Compare four business workflows",
+        "prompt": "Choose support, sales, document processing or financial operations. In 45 minutes design one, then explain three changes needed for a second. Address the ten questions in the guide and include five eval cases.",
+        "acceptance_checks": [
+          "AI/agent choice is justified against deterministic baseline.",
+          "Tools/approval and PII/injection controls are concrete.",
+          "Business metric and failure evals fit both selected workflows."
+        ],
+        "interviewer_notes": "Accept a deterministic final design if justified. Financial effects and external contact need explicit authority/approval.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Search, knowledge, coding or delegation",
+        "prompt": "Choose internal knowledge, enterprise search, coding or multi-agent workflow. Design it for 200 concurrent users and p95 <= 10s, stating assumptions. Then handle a tenfold load increase and a revoked data permission during a running job.",
+        "acceptance_checks": [
+          "Covers all ten design questions and five eval cases.",
+          "Reauthorization and cache/retrieval isolation survive revocation.",
+          "Explains capacity, degradation and whether subagents justify cost."
+        ],
+        "interviewer_notes": "The 10s target may be infeasible; honest decomposition and negotiation are valid. Do not reward unsupported latency claims.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "An acceptable case answer can reject AI?",
+        "options": [
+          "Only after training a model",
+          "Never",
+          "Yes, if workflow evidence favors deterministic logic",
+          "Only for small companies"
+        ],
+        "answer": 2,
+        "explanation": "The task is sound engineering judgment, not maximizing AI use."
+      },
+      {
+        "question": "What must subagents share or coordinate?",
+        "options": [
+          "Only names",
+          "Budgets, state ownership and bounded handoff contracts",
+          "No constraints",
+          "Unrestricted credentials"
+        ],
+        "answer": 1,
+        "explanation": "Delegation adds coordination and authorization risks."
+      },
+      {
+        "question": "Which question belongs in every case?",
+        "options": [
+          "How is business value measured?",
+          "Which GPU kernel?",
+          "Which RLHF recipe?",
+          "Which logo?"
+        ],
+        "answer": 0,
+        "explanation": "Enterprise architecture must connect implementation to outcomes."
+      }
+    ]
+  },
+  {
+    "id": "customer-communication",
+    "track": "behavioral",
+    "title": "Discovery and architecture defense",
+    "stage": "Phase 8 · Applied interviews",
+    "minutes": 60,
+    "objectives": [
+      "Ask discovery questions and negotiate implementation plans.",
+      "Explain tradeoffs to engineers, product, security and executives."
+    ],
+    "prerequisites": [
+      "enterprise-architecture"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Discover before proposing",
+        "prompt": "Role-play a support leader requesting full AI automation next month. Write eight prioritized questions, then a concise summary with assumptions, missing information, success metrics and a phased implementation proposal.",
+        "acceptance_checks": [
+          "Questions uncover workflow, baseline, integration/security and ownership.",
+          "Plan contains dependencies, acceptance gates and a next decision.",
+          "Does not invent customer answers or promise unsupported results."
+        ],
+        "interviewer_notes": "Evaluate discovery and negotiation quality, not agreeableness or personality.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Defend one decision to four audiences",
+        "prompt": "Choose a real or explicitly hypothetical decision to require approval before refunds. Explain it to engineers, product, security and a CTO in at most 150 words each. Include the strongest alternative and evidence that could change your position.",
+        "acceptance_checks": [
+          "Same factual decision is communicated consistently.",
+          "Each audience gets relevant tradeoffs and next action.",
+          "Real ownership and hypothetical claims are distinguished."
+        ],
+        "interviewer_notes": "Engineering: contracts; product: friction/value; security: controls; executive: risk/investment. Avoid jargon-only defense.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "What should discovery establish early?",
+        "options": [
+          "Maximum model size",
+          "A promised ROI",
+          "Favorite framework",
+          "Workflow baseline and outcome owner"
+        ],
+        "answer": 3,
+        "explanation": "Baseline and ownership make success assessable."
+      },
+      {
+        "question": "Good architecture defense includes:",
+        "options": [
+          "Only advantages",
+          "Dismissal of alternatives",
+          "Evidence that could change the decision",
+          "Invented customer metrics"
+        ],
+        "answer": 2,
+        "explanation": "Technical judgment includes falsifiable tradeoffs."
+      },
+      {
+        "question": "How should audience adaptation change facts?",
+        "options": [
+          "Invent metrics for product",
+          "Keep facts consistent; change emphasis and detail",
+          "Make them more impressive",
+          "Hide uncertainty from executives"
+        ],
+        "answer": 1,
+        "explanation": "Clear communication preserves accuracy."
+      }
+    ]
+  },
+  {
+    "id": "work-mode",
+    "track": "project",
+    "title": "Interview Mode vs Work Mode",
+    "stage": "Phase 8 · Applied interviews",
+    "minutes": 60,
+    "objectives": [
+      "Use AI actively at work and verify its output.",
+      "Keep independent interview evidence separate from assisted work."
+    ],
+    "prerequisites": [
+      "role-diagnostic"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Review AI-assisted work",
+        "prompt": "Describe an AI-assisted change to retry behavior. Supply a review checklist, meaningful fake-transport tests, one rejected AI suggestion and an evidence log. Label any unexecuted tests. Explain how you would debug it without AI.",
+        "acceptance_checks": [
+          "Tests exercise behavior rather than mocking the function under test.",
+          "Covers cancellation, permanent errors and bounded attempts.",
+          "Distinguishes proposed, executed and model-claimed results."
+        ],
+        "interviewer_notes": "Reward independent verification and small reviewable changes, not mere tool usage.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Plan a two-track week",
+        "prompt": "Allocate 12–15 hours across project work, two 45-minute coding attempts, design/behavioral practice and review. Specify allowed AI use in each block and a fresh-task remediation loop. Include threat-model/eval generation and manual validation.",
+        "acceptance_checks": [
+          "Interview attempts remain unaided and preserved.",
+          "Work uses AI with tests, diff review and label validation.",
+          "Plan produces independent evidence as well as portfolio artifacts."
+        ],
+        "interviewer_notes": "Do not count post-hint corrections as fresh first attempts.",
+        "starter_code": "",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "AI-generated tests are sufficient when:",
+        "options": [
+          "They are reviewed and actually run against meaningful behavior",
+          "They mock the target function",
+          "They only cover success",
+          "The model says they passed"
+        ],
+        "answer": 0,
+        "explanation": "Tests require independent scrutiny and execution."
+      },
+      {
+        "question": "When may AI review an interview attempt?",
+        "options": [
+          "Never",
+          "During implementation",
+          "Before reasoning",
+          "After the original unaided attempt is preserved"
+        ],
+        "answer": 3,
+        "explanation": "Post-attempt review supports learning without rewriting the evidence."
+      },
+      {
+        "question": "Is Work Mode an autonomous code-execution feature here?",
+        "options": [
+          "Only for Python",
+          "Only for project lessons",
+          "No; it describes AI-assisted work discipline",
+          "Yes"
+        ],
+        "answer": 2,
+        "explanation": "The lab reviews submitted code; it does not execute portfolio code."
+      }
+    ]
+  },
+  {
+    "id": "dsa-sequences",
+    "track": "coding",
+    "title": "DSA 1 · Arrays, windows and search",
+    "stage": "DSA · Unassisted progression",
+    "minutes": 60,
+    "objectives": [
+      "Practice hashing, two pointers, windows, stacks and binary search.",
+      "Progress from easy contracts to medium invariant reasoning without AI."
+    ],
+    "prerequisites": [
+      "production-python"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Earliest target pair · easy",
+        "prompt": "Implement pair_indices(nums, target) returning (i,j) with i<j and nums[i]+nums[j]==target. Choose the smallest j, then smallest i; return None if absent. Do not mutate input. For [3,3,2,4], target=6 returns (0,1). Aim for expected O(n); include tests.",
+        "acceptance_checks": [
+          "Duplicates use distinct indices and earliest tie-breaking.",
+          "Empty/no-solution input returns None.",
+          "Explains prefix invariant and expected O(n) time/O(n) space."
+        ],
+        "interviewer_notes": "Store first index per value, check complement before insertion; retain earliest index for ties.",
+        "starter_code": "def pair_indices(nums: list[int], target: int) -> tuple[int, int] | None:\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Longest distinct window · medium",
+        "prompt": "Implement longest_distinct(items: list[str]) -> tuple[int,int] returning a half-open [start,end) interval containing no repeated values. Maximize length, choose earliest start on ties; empty input returns (0,0). For ['a','b','a','c'] return (1,4). Aim for O(n).",
+        "acceptance_checks": [
+          "Moves left boundary forward, never backward.",
+          "Correct half-open interval, tie and empty behavior.",
+          "Tests repeated-only, all-distinct and nonadjacent duplicates."
+        ],
+        "interviewer_notes": "Use last-seen indices with left=max(left,last+1); update best only on strictly greater length.",
+        "starter_code": "def longest_distinct(items: list[str]) -> tuple[int, int]:\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "Why check complement before inserting current index?",
+        "options": [
+          "To sort input",
+          "To prevent using one element twice",
+          "To avoid any memory",
+          "To change target"
+        ],
+        "answer": 1,
+        "explanation": "The pair requires distinct positions."
+      },
+      {
+        "question": "A sliding window's left bound should:",
+        "options": [
+          "Never move backward in this algorithm",
+          "Skip all tests",
+          "Always reset to zero",
+          "Move backward on duplicates"
+        ],
+        "answer": 0,
+        "explanation": "Monotonic movement preserves linear total work."
+      },
+      {
+        "question": "A lower-bound search predicate should be:",
+        "options": [
+          "Random",
+          "Different each iteration",
+          "Based on midpoint parity",
+          "Monotonic over the search interval"
+        ],
+        "answer": 3,
+        "explanation": "Binary search requires a consistent partition."
+      }
+    ]
+  },
+  {
+    "id": "dsa-trees-graphs",
+    "track": "coding",
+    "title": "DSA 2 · Trees, heaps and graphs",
+    "stage": "DSA · Unassisted progression",
+    "minutes": 60,
+    "objectives": [
+      "Use BFS/DFS, heaps and topological reasoning.",
+      "Handle cycles, disconnected inputs and traversal invariants."
+    ],
+    "prerequisites": [
+      "dsa-sequences"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Shortest tool path · medium",
+        "prompt": "Implement shortest_path(graph, start, goal) for a directed unweighted adjacency dict with all nodes as keys and list-valued neighbors. Return any shortest node path, or None if unreachable. start==goal returns [start]; unknown endpoints raise ValueError. Do not mutate graph.",
+        "acceptance_checks": [
+          "BFS produces a shortest path and terminates on cycles.",
+          "Handles disconnected, empty and identical endpoints.",
+          "Explains O(V+E) time and parent/visited storage."
+        ],
+        "interviewer_notes": "Mark at enqueue; use deque and parent pointers rather than copying whole paths unnecessarily.",
+        "starter_code": "def shortest_path(graph, start, goal):\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Order workflow dependencies · medium",
+        "prompt": "Implement order_tasks(tasks, dependencies), where (a,b) means a must precede b. Return any valid ordering including isolated tasks; raise ValueError for duplicate task IDs, unknown IDs or cycles. Repeated identical edges count once. Test a cycle and diamond dependency.",
+        "acceptance_checks": [
+          "All tasks appear once, respecting every dependency.",
+          "Duplicate edges do not inflate unmet counts.",
+          "Detects a cycle and explains adjacency/indegree complexity."
+        ],
+        "interviewer_notes": "Kahn's algorithm or DFS coloring acceptable; do not confuse repeated edge with distinct prerequisite.",
+        "starter_code": "def order_tasks(tasks, dependencies):\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "For shortest hops in an unweighted graph choose:",
+        "options": [
+          "Random walk",
+          "Arbitrary DFS",
+          "BFS",
+          "Sort IDs"
+        ],
+        "answer": 2,
+        "explanation": "BFS explores layers of increasing hop count."
+      },
+      {
+        "question": "Why mark visited at enqueue?",
+        "options": [
+          "To avoid using a queue",
+          "To avoid repeated frontier insertion",
+          "To detect every weighted shortest path",
+          "To lose parent data"
+        ],
+        "answer": 1,
+        "explanation": "Each node should enter the frontier once."
+      },
+      {
+        "question": "Topological traversal emits fewer than all known nodes:",
+        "options": [
+          "Indicates a cycle under a valid graph contract",
+          "Always success",
+          "Means graph is a tree",
+          "Means IDs need sorting"
+        ],
+        "answer": 0,
+        "explanation": "Nodes trapped in a cycle never reach zero unmet prerequisites."
+      }
+    ]
+  },
+  {
+    "id": "dsa-dynamic-programming",
+    "track": "coding",
+    "title": "DSA 3 · Dynamic programming and mocks",
+    "stage": "DSA · Unassisted progression",
+    "minutes": 60,
+    "objectives": [
+      "Derive small DP states, transitions and base cases.",
+      "Complete timed mixed coding rounds and fresh remediation."
+    ],
+    "prerequisites": [
+      "dsa-trees-graphs"
+    ],
+    "required": true,
+    "exercises": [
+      {
+        "title": "Best nonadjacent workload · medium",
+        "prompt": "Implement max_nonadjacent(gains: list[int]) -> int for nonnegative integers, allowing an empty selection. Empty input returns 0; [2,7,9,3,1] returns 12. Use O(n) time and O(1) extra space. Explain recurrence and test boundaries.",
+        "acceptance_checks": [
+          "Does not choose adjacent items.",
+          "Rolling state preserves both previous values correctly.",
+          "Tests empty, singleton, zero and a case that defeats greedy choice."
+        ],
+        "interviewer_notes": "Track skip/take or two previous best values. Time is linear, no exponential recursion.",
+        "starter_code": "def max_nonadjacent(gains: list[int]) -> int:\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      },
+      {
+        "title": "Minimum token bundles · medium",
+        "prompt": "Implement min_bundles(sizes, target) with reusable positive integer sizes and nonnegative integer target. Return the minimum count or None if impossible; target 0 returns 0. Reject nonpositive sizes and negative target. [1,3,4],6 returns 2, not greedy 3.",
+        "acceptance_checks": [
+          "Distinguishes unreachable state from zero.",
+          "Uses valid recurrence and tests impossible/zero/invalid cases.",
+          "Explains O(target * distinct_sizes) time and O(target) space."
+        ],
+        "interviewer_notes": "DP[0]=0; choose min reachable predecessor+1; deduplicate sizes optionally. Avoid unsupported greedy correctness.",
+        "starter_code": "def min_bundles(sizes: list[int], target: int) -> int | None:\n    raise NotImplementedError\n",
+        "minutes": 45,
+        "constraints": [
+          "State assumptions and distinguish implemented results from plans.",
+          "Run code/tests in your own environment; the lab does not execute submissions."
+        ]
+      }
+    ],
+    "checks": [
+      {
+        "question": "What should be defined before a DP recurrence?",
+        "options": [
+          "A cache library",
+          "A recursion limit",
+          "Variable names only",
+          "The meaning of each state"
+        ],
+        "answer": 3,
+        "explanation": "State meaning determines valid transitions and base cases."
+      },
+      {
+        "question": "Why can greedy coin selection fail?",
+        "options": [
+          "It always fails",
+          "DP has no complexity",
+          "Largest local choice may prevent minimum global count",
+          "Coins cannot repeat"
+        ],
+        "answer": 2,
+        "explanation": "For [1,3,4] and 6, two 3s beat 4+1+1."
+      },
+      {
+        "question": "After solving with hints, what establishes improvement?",
+        "options": [
+          "Reading the answer again",
+          "A fresh unaided problem with reasoning and tests",
+          "Resubmitting the same solution",
+          "Increasing the score manually"
+        ],
+        "answer": 1,
+        "explanation": "Independent transfer matters more than assisted repetition."
+      }
+    ]
+  }
+]
